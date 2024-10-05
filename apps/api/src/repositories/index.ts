@@ -1,4 +1,4 @@
-import type { User } from "@/types/user";
+import type { User } from "drizzle/schemas/users";
 
 export interface UsersRepository {
   getAll: () => Promise<User[]>;

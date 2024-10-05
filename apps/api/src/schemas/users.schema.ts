@@ -1,4 +1,4 @@
-import type { User } from "@/types/user";
+import type { User } from "drizzle/schemas/users";
 import { z } from "zod";
 
 export const userSchema = z.object({
@@ -16,4 +16,6 @@ export const userSchema = z.object({
   password: z.string().openapi({
     example: "MyP@ssw0rd!",
   }),
+  createdAt: z.string().date(),
+  updatedAt: z.string().date(),
 }) satisfies z.ZodSchema<User>;

@@ -1,19 +1,23 @@
-import type { User } from "@/types/user";
+import type { User } from "drizzle/schemas/users";
 import type { UsersRepository } from "..";
 
 export class InMemoryUsersRepository implements UsersRepository {
   private users: User[] = [
     {
-      id: crypto.randomUUID(),
+      id: crypto.randomUUID().toString(),
       username: "John_Doe",
       email: "john.doe@example.com",
       password: "randomHash",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     },
     {
-      id: crypto.randomUUID(),
+      id: crypto.randomUUID().toString(),
       username: "Joe_Shmoe",
       email: "joe.shmoe@example.com",
       password: "anotherRandomHash",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     },
   ];
 
