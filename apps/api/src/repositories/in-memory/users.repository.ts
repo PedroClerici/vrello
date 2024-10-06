@@ -1,7 +1,7 @@
 import type { User } from "drizzle/schemas/users";
-import type { UsersRepository } from "..";
+import type { Repository } from "..";
 
-export class InMemoryUsersRepository implements UsersRepository {
+export class InMemoryUsersRepository implements Repository<User> {
   private users: User[] = [
     {
       id: crypto.randomUUID().toString(),
@@ -21,23 +21,33 @@ export class InMemoryUsersRepository implements UsersRepository {
     },
   ];
 
-  async create(data: Omit<User, "id">): Promise<User> {
-    const newUser = { ...data, id: crypto.randomUUID() };
+  async create(
+    data: Omit<User, "id" | "createdAt" | "updatedAt">,
+  ): Promise<User> {
+    const newUser = {
+      ...data,
+      id: crypto.randomUUID().toString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
     this.users.push(newUser);
     return newUser;
   }
 
-  async getAll(): Promise<User[]> {
+  async all(): Promise<User[]> {
     return this.users;
   }
 
-  async getById(id: string): Promise<User | undefined> {
+  async find(id: string): Promise<User | undefined> {
     const index = this.users.findIndex((user) => user.id === id);
     return index !== -1 ? this.users[index] : undefined;
   }
 
-  async getByEmail(email: string): Promise<User | undefined> {
-    return this.users.find((user) => user.email === email);
+  async findBy(
+    key: Exclude<keyof User, number>,
+    value: User[keyof User],
+  ): Promise<User[]> {
+    return this.users.filter((user) => user[key] === value);
   }
 
   async update(id: string, data: Partial<User>) {

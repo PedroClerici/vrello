@@ -16,6 +16,6 @@ export const userSchema = z.object({
   password: z.string().openapi({
     example: "MyP@ssw0rd!",
   }),
-  createdAt: z.string().date(),
-  updatedAt: z.string().date(),
+  createdAt: z.string().refine((arg) => new Date(arg)),
+  updatedAt: z.string().refine((arg) => new Date(arg)),
 }) satisfies z.ZodSchema<User>;

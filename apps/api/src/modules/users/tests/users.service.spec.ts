@@ -1,11 +1,11 @@
-import type { UsersRepository } from "@/repositories";
+import type { Repository } from "@/repositories";
 import { InMemoryUsersRepository } from "@/repositories/in-memory/users.repository";
-import type { User } from "@/types/user";
+import type { User } from "drizzle/schemas/users";
 import { NotFoundError } from "@/utils/errors";
 import { UsersService } from "../users.service";
 
 describe("Users Service", () => {
-  let usersRepositoryInstance: UsersRepository;
+  let usersRepositoryInstance: Repository<User>;
   let usersServiceInstance: UsersService;
   let inMemoryUsers: User[];
 
@@ -13,7 +13,7 @@ describe("Users Service", () => {
     usersRepositoryInstance = new InMemoryUsersRepository();
     usersServiceInstance = new UsersService(usersRepositoryInstance);
 
-    inMemoryUsers = await usersRepositoryInstance.getAll();
+    inMemoryUsers = await usersRepositoryInstance.all();
   });
 
   it("Must be possible to get users", async () => {

@@ -1,10 +1,12 @@
 import { db } from "drizzle";
-import { users, type User } from "drizzle/schemas/users";
 import { eq } from "drizzle-orm";
-import type { UsersRepository } from "..";
+import { type User, users } from "drizzle/schemas/users";
+import type { Repository } from "..";
 
-export class DrizzleUsersRepository implements UsersRepository {
-  async create(data: Omit<User, "id">): Promise<User | undefined> {
+export class DrizzleUsersRepository implements Repository<User> {
+  async create(
+    data: Omit<User, "id" | "createdAt" | "updatedAt">,
+  ): Promise<User | undefined> {
     const [user] = await db.insert(users).values(data).returning();
     if (!user) {
       return undefined;
@@ -13,11 +15,11 @@ export class DrizzleUsersRepository implements UsersRepository {
     return user;
   }
 
-  async getAll(): Promise<User[]> {
+  async all(): Promise<User[]> {
     return await db.select().from(users);
   }
 
-  async getById(id: string): Promise<User | undefined> {
+  async find(id: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     if (!user) {
       return undefined;
@@ -26,13 +28,11 @@ export class DrizzleUsersRepository implements UsersRepository {
     return user;
   }
 
-  async getByEmail(email: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.email, email));
-    if (!user) {
-      return undefined;
-    }
-
-    return user;
+  async findBy(
+    key: Exclude<keyof User, number>,
+    value: User[keyof User],
+  ): Promise<User[]> {
+    return await db.select().from(users).where(eq(users[key], value));
   }
 
   async update(id: string, data: Partial<User>) {

@@ -1,3 +1,5 @@
+import type { PinoLoggerOptions } from "fastify/types/logger";
+
 export const loggerConfig = {
   development: {
     level: "DEBUG",
@@ -8,7 +10,7 @@ export const loggerConfig = {
         ignore: "pid,hostname",
       },
     },
-  },
+  } satisfies PinoLoggerOptions,
   production: true,
   test: false,
 };

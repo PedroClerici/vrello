@@ -1,7 +1,4 @@
 import "zod-openapi/extend";
-import { join } from "node:path";
-import { fileURLToPath } from "node:url";
-import fastifyAutoLoad from "@fastify/autoload";
 import fastifySwagger from "@fastify/swagger";
 import fastifyScalarUI from "@scalar/fastify-api-reference";
 import { fastify } from "fastify";
@@ -13,6 +10,7 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from "fastify-zod-openapi";
+import { usersRouter } from "./modules/users/users.router";
 import { env } from "./utils/env";
 import { makeError } from "./utils/errors";
 import { loggerConfig } from "./utils/logger";
@@ -47,12 +45,14 @@ await app.register(fastifyScalarUI, {
 app.setErrorHandler(async (err, request, reply) => {
   request.log.error(err);
   const error = makeError(err);
+  if (env.NODE_ENV !== "production" && error.statusCode === 500)
+    console.error(err);
 
   return reply.status(error.statusCode).send(error);
 });
 
-await app.register(fastifyAutoLoad, {
-  dir: join(fileURLToPath(import.meta.url), "..", "modules"),
-  matchFilter: /\.router\./,
-  ignorePattern: /^.*(?:test|spec).ts$/,
+await app.register((app, _, done) => {
+  app.register(usersRouter, { prefix: "/users" });
+
+  done();
 });

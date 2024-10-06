@@ -1,15 +1,15 @@
-import type { User } from "drizzle/schemas/users";
+export interface Repository<T> {
+  create: (
+    data: Omit<T, "id" | "createdAt" | "updatedAt">,
+  ) => Promise<T | undefined>;
 
-export interface UsersRepository {
-  getAll: () => Promise<User[]>;
+  all: () => Promise<T[]>;
 
-  getById: (id: string) => Promise<User | undefined>;
+  find: (id: string) => Promise<T | undefined>;
 
-  getByEmail: (email: string) => Promise<User | undefined>;
+  findBy: (key: Exclude<keyof T, number>, value: T[keyof T]) => Promise<T[]>;
 
-  create: (data: Omit<User, "id">) => Promise<User | undefined>;
-
-  update: (id: string, data: Partial<User>) => Promise<User | undefined>;
+  update: (id: string, data: Partial<T>) => Promise<T | undefined>;
 
   delete: (id: string) => Promise<void>;
 }
