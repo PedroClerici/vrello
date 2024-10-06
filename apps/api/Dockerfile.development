@@ -6,22 +6,25 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
 # Create app directory
-WORKDIR /app
+WORKDIR /usr/local/apps/api
 
 # Copy package.json and package-lock.json
-COPY package.json pnpm-lock.yaml ./
+COPY package.json .
+COPY pnpm-lock.yaml .
 
 # Install app dependencies
 RUN pnpm install
+ENV PATH=/usr/local/api/node_modules/.bin:$PATH
 
 # Bundle app source
 COPY . .
 
-# Build the TypeScript files
-RUN pnpm build
-
-# Expose port 8080
-EXPOSE 8080
+# Expose port
+EXPOSE ${PORT}
+ARG ADDRESS="0.0.0.0"
+ENV ADDRESS=$ADDRESS
+ARG PORT=3000
+ENV PORT=$PORT
 
 # Start the app
-CMD ["pnpm", "start"]
+CMD ["pnpm", "dev:migrate"]

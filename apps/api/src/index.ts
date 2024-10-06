@@ -1,7 +1,7 @@
 import { app } from "./app";
 import { env } from "./utils/env";
 
-await app.listen({ port: env.PORT });
+await app.listen({ host: env.ADDRESS, port: env.PORT });
 
 function onCloseSignal() {
   app.log.info("SIGINT received, shutting down");

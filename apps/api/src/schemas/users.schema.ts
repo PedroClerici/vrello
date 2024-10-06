@@ -1,3 +1,4 @@
+import "zod-openapi/extend";
 import type { User } from "drizzle/schemas/users";
 import { z } from "zod";
 

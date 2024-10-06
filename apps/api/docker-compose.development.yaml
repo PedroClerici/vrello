@@ -1,0 +1,36 @@
+services:
+  api:
+    tty: true
+    container_name: api
+    build:
+      dockerfile: Dockerfile.development
+      args:
+        ADDRESS: ${ADDRESS}
+        PORT: ${PORT}
+    restart: always
+    ports:
+      - ${PORT}:${PORT}
+    depends_on:
+      - db
+    env_file:
+      - .env.development
+    volumes:
+      - ./:/usr/local/apps/api
+      - ignore:/usr/local/apps/api/node_modules
+
+  db:
+    tty: true
+    container_name: db
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - ${DB_PORT}:5432
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+volumes:
+  db-data:
+  ignore:

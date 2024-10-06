@@ -27,8 +27,8 @@ await app.register(fastifyZodOpenApiPlugin);
 await app.register(fastifySwagger, {
   openapi: {
     info: {
-      title: "Fastify API Boilerplate",
-      version: "0.1.0",
+      title: "Vrello API Docs",
+      version: "0.0.1",
     },
   },
   transform: fastifyZodOpenApiTransform,

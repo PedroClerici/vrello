@@ -6,6 +6,7 @@ config();
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]),
   PORT: z.coerce.number(),
+  ADDRESS: z.string(),
   SALT_ROUNDS: z.coerce.number(),
 
   DB_USER: z.string(),
