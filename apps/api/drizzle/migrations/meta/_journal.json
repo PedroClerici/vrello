@@ -8,6 +8,13 @@
       "when": 1728090719402,
       "tag": "0000_superb_reavers",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1728495909426,
+      "tag": "0001_many_mastermind",
+      "breakpoints": true
     }
   ]
 }

@@ -1,5 +1,5 @@
 import type { User } from "drizzle/schemas/users";
-import type { Repository } from "..";
+import type { Filter, Keys, Repository } from "..";
 
 export class InMemoryUsersRepository implements Repository<User> {
   private users: User[] = [
@@ -43,11 +43,21 @@ export class InMemoryUsersRepository implements Repository<User> {
     return index !== -1 ? this.users[index] : undefined;
   }
 
+  async findBy(key: Keys<User>, value: User[keyof User]): Promise<User[]>;
+  async findBy(filter: Filter<User>): Promise<User[]>;
   async findBy(
-    key: Exclude<keyof User, number>,
-    value: User[keyof User],
-  ): Promise<User[]> {
-    return this.users.filter((user) => user[key] === value);
+    keyOrFilter: Keys<User> | Filter<User>,
+    value?: User[keyof User],
+  ) {
+    if (typeof value === "string" && typeof keyOrFilter === "string") {
+      return this.users.filter((user) => user[keyOrFilter] === value);
+    }
+
+    return this.users.filter((user) =>
+      Object.entries(keyOrFilter).every(
+        ([key, value]) => user[key as keyof Filter<User>] === value,
+      ),
+    );
   }
 
   async update(id: string, data: Partial<User>) {
@@ -64,5 +74,22 @@ export class InMemoryUsersRepository implements Repository<User> {
     if (index !== -1) {
       this.users.splice(index, 1);
     }
+  }
+
+  async deleteBy(key: Keys<User>, value: User[keyof User]): Promise<void>;
+  async deleteBy(filter: Filter<User>): Promise<void>;
+  async deleteBy(
+    keyOrFilter: Keys<User> | Filter<User>,
+    value?: User[keyof User],
+  ) {
+    if (typeof value === "string" && typeof keyOrFilter === "string") {
+      this.users = this.users.filter((user) => user[keyOrFilter] === value);
+    }
+
+    this.users = this.users.filter((user) =>
+      Object.entries(keyOrFilter).every(
+        ([key, value]) => user[key as keyof Filter<User>] === value,
+      ),
+    );
   }
 }

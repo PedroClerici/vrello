@@ -21,8 +21,10 @@ export default async function setup({ provide }: GlobalSetupContext) {
     DB_PORT: "5432",
   };
 
-  const apiContainerBuild =
-    await GenericContainer.fromDockerfile("@/../").build();
+  const apiContainerBuild = await GenericContainer.fromDockerfile(
+    "@/../",
+    "Dockerfile.development",
+  ).build();
 
   const network = await new Network().start();
   const postgresContainer = await new GenericContainer("postgres:alpine")

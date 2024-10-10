@@ -1,7 +1,7 @@
 import type { Repository } from "@/repositories";
 import { InMemoryUsersRepository } from "@/repositories/in-memory/users.repository";
-import type { User } from "drizzle/schemas/users";
 import { NotFoundError } from "@/utils/errors";
+import type { User } from "drizzle/schemas/users";
 import { UsersService } from "../users.service";
 
 describe("Users Service", () => {

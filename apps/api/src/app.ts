@@ -1,4 +1,6 @@
 import "zod-openapi/extend";
+import fastifyCookie from "@fastify/cookie";
+import fastifyJwt from "@fastify/jwt";
 import fastifySwagger from "@fastify/swagger";
 import fastifyScalarUI from "@scalar/fastify-api-reference";
 import { fastify } from "fastify";
@@ -10,6 +12,7 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from "fastify-zod-openapi";
+import { authRouter } from "./modules/auth/auth.router";
 import { usersRouter } from "./modules/users/users.router";
 import { env } from "./utils/env";
 import { makeError } from "./utils/errors";
@@ -24,6 +27,17 @@ app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
 
 await app.register(fastifyZodOpenApiPlugin);
+
+await app.register(fastifyJwt, {
+  secret: env.JWT_SECRET,
+  cookie: {
+    cookieName: "refreshToken",
+    signed: false,
+  },
+});
+
+await app.register(fastifyCookie);
+
 await app.register(fastifySwagger, {
   openapi: {
     info: {
@@ -43,15 +57,17 @@ await app.register(fastifyScalarUI, {
 });
 
 app.setErrorHandler(async (err, request, reply) => {
-  request.log.error(err);
   const error = makeError(err);
-  if (env.NODE_ENV !== "production" && error.statusCode === 500)
+  if (error.statusCode === 500) {
+    request.log.error(err);
     console.error(err);
+  }
 
   return reply.status(error.statusCode).send(error);
 });
 
 await app.register((app, _, done) => {
+  app.register(authRouter);
   app.register(usersRouter, { prefix: "/users" });
 
   done();

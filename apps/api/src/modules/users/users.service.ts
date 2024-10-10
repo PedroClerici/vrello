@@ -4,14 +4,15 @@ import { env } from "@/utils/env";
 import { ConflictError, NotFoundError } from "@/utils/errors";
 import { hash } from "@node-rs/bcrypt";
 import type { User } from "drizzle/schemas/users";
-import type { createUserBody, putUserBody } from "./users.schema";
+import type { putUserBody } from "./users.schema";
+import type { signupBody } from "../auth/auth.schema";
 
 export class UsersService {
   constructor(
     private readonly usersRepository: Repository<User> = new DrizzleUsersRepository(),
   ) {}
 
-  createUser = async ({ username, email, password }: createUserBody) => {
+  createUser = async ({ username, email, password }: signupBody) => {
     const [userWithSameEmail] = await this.usersRepository.findBy(
       "email",
       email,

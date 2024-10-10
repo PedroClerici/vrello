@@ -1,5 +1,6 @@
-import { sql, type InferSelectModel } from "drizzle-orm";
-import { pgTable, uuid, timestamp, varchar } from "drizzle-orm/pg-core";
+import { type InferSelectModel, relations, sql } from "drizzle-orm";
+import { pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { refreshTokens } from "./refresh-tokens";
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
@@ -12,5 +13,9 @@ export const users = pgTable("users", {
     .defaultNow()
     .$onUpdate(() => sql`now()`),
 });
+
+export const usersRelations = relations(users, ({ many }) => ({
+  posts: many(refreshTokens),
+}));
 
 export type User = InferSelectModel<typeof users>;

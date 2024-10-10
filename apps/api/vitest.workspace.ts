@@ -1,5 +1,5 @@
-import { config } from "dotenv";
 import path from "node:path";
+import { config } from "dotenv";
 import { defineWorkspace } from "vitest/config";
 
 export default defineWorkspace([
