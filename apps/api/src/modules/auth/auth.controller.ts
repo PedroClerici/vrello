@@ -1,9 +1,9 @@
+import { UnauthorizedError } from "@/utils/errors";
+import type { SignPayloadType } from "@fastify/jwt";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { usersService } from "../users/users.service";
 import type { loginBody, signupBody } from "./auth.schema";
 import { authService } from "./auth.service";
-import type { SignPayloadType } from "@fastify/jwt";
-import { UnauthorizedError } from "@/utils/errors";
 
 class AuthController {
   signup = async (

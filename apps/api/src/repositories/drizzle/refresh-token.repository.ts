@@ -1,10 +1,10 @@
-import {
-  refreshTokens,
-  type RefreshToken,
-} from "drizzle/schemas/refresh-tokens";
-import { and, eq, type SQLWrapper } from "drizzle-orm";
-import type { Filter, Insert, Keys, Repository } from "..";
 import { db } from "drizzle";
+import { type SQLWrapper, and, eq } from "drizzle-orm";
+import {
+  type RefreshToken,
+  refreshTokens,
+} from "drizzle/schemas/refresh-tokens";
+import type { Filter, Insert, Keys, Repository } from "..";
 
 export class DrizzleRefreshTokensRepository
   implements Repository<RefreshToken>

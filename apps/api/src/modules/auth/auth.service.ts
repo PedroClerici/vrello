@@ -1,13 +1,13 @@
 import type { Repository } from "@/repositories";
+import { DrizzleRefreshTokensRepository } from "@/repositories/drizzle/refresh-token.repository";
 import { DrizzleUsersRepository } from "@/repositories/drizzle/users.repository";
+import { env } from "@/utils/env";
 import { UnauthorizedError } from "@/utils/errors";
+import type { SignPayloadType } from "@fastify/jwt";
 import { compare } from "@node-rs/bcrypt";
+import type { RefreshToken } from "drizzle/schemas/refresh-tokens";
 import type { User } from "drizzle/schemas/users";
 import type { loginBody } from "./auth.schema";
-import { DrizzleRefreshTokensRepository } from "@/repositories/drizzle/refresh-token.repository";
-import type { SignPayloadType } from "@fastify/jwt";
-import { env } from "@/utils/env";
-import type { RefreshToken } from "drizzle/schemas/refresh-tokens";
 
 class AuthService {
   constructor(
@@ -69,7 +69,6 @@ class AuthService {
     const savedRefreshToken = await this.refreshTokenRepository.find(
       refreshToken.jti,
     );
-    console.error(savedRefreshToken);
     if (!savedRefreshToken)
       throw new UnauthorizedError("Invalid refresh token");
 

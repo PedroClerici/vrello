@@ -1,57 +1,20 @@
-import { GenericContainer, Network } from "testcontainers";
-import type { GlobalSetupContext } from "vitest/node";
+import { execSync } from "node:child_process";
+import { PostgreSqlContainer } from "@testcontainers/postgresql";
 
-declare module "vitest" {
-  export interface ProvidedContext {
-    apiUrl: string;
-  }
-}
+export default async function setup() {
+  const postgresContainer = await new PostgreSqlContainer(
+    "postgres:alpine",
+  ).start();
 
-export default async function setup({ provide }: GlobalSetupContext) {
-  const environment = {
-    NODE_ENV: "test",
-    PORT: "3000",
-    ADDRESS: "0.0.0.0",
-    SALT_ROUNDS: "10",
+  process.env.DB_USER = postgresContainer.getUsername();
+  process.env.DB_PASSWORD = postgresContainer.getPassword();
+  process.env.DB_HOST = postgresContainer.getHost();
+  process.env.DB_PORT = postgresContainer.getPort().toString();
+  process.env.DB_NAME = postgresContainer.getDatabase();
 
-    DB_HOST: "test_postgres",
-    DB_USER: "postgres",
-    DB_PASSWORD: "postgres",
-    DB_NAME: "test",
-    DB_PORT: "5432",
-  };
-
-  const apiContainerBuild = await GenericContainer.fromDockerfile(
-    "@/../",
-    "Dockerfile.development",
-  ).build();
-
-  const network = await new Network().start();
-  const postgresContainer = await new GenericContainer("postgres:alpine")
-    .withName("test_postgres")
-    .withExposedPorts(5432)
-    .withEnvironment({
-      POSTGRES_USER: environment.DB_USER,
-      POSTGRES_PASSWORD: environment.DB_PASSWORD,
-      POSTGRES_DB: environment.DB_NAME,
-    })
-    .withNetworkMode(network.getName())
-    .start();
-
-  const apiContainer = await apiContainerBuild
-    .withExposedPorts(3000)
-    .withEnvironment(environment)
-    .withNetworkMode(network.getName())
-    .start();
-
-  provide(
-    "apiUrl",
-    `http://${apiContainer.getHost()}:${apiContainer.getMappedPort(3000)}`,
-  );
+  execSync("pnpm db:migrate");
 
   return async () => {
-    await apiContainer.stop();
     await postgresContainer.stop();
-    await network.stop();
   };
 }

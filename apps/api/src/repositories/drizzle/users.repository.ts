@@ -1,5 +1,5 @@
 import { db } from "drizzle";
-import { and, eq, type SQLWrapper } from "drizzle-orm";
+import { type SQLWrapper, and, eq } from "drizzle-orm";
 import { type User, users } from "drizzle/schemas/users";
 import type { Filter, Insert, Keys, Repository } from "..";
 

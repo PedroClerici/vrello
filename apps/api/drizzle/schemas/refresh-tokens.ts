@@ -1,5 +1,5 @@
 import { type InferSelectModel, relations, sql } from "drizzle-orm";
-import { pgTable, timestamp, uuid, integer } from "drizzle-orm/pg-core";
+import { integer, pgTable, timestamp, uuid } from "drizzle-orm/pg-core";
 import { users } from "./users";
 
 export const refreshTokens = pgTable("refresh_tokens", {

@@ -1,19 +1,16 @@
+import { app } from "@/app";
 import { faker } from "@faker-js/faker";
-import axios from "axios";
 import type { User } from "drizzle/schemas/users";
-import { inject } from "vitest";
+import request from "supertest";
 
 describe("User API Endpoints", async () => {
-  beforeAll(async () => {
-    axios.defaults.baseURL = inject("apiUrl");
-    axios.defaults.validateStatus = () => true;
+  beforeAll(() => {
+    app.ready();
   });
 
   describe("GET /users", async () => {
     it("Should be able to get users", async () => {
-      const response = await axios.get("/users");
-
-      expect(response.status).toBe(200);
+      await request(app.server).get("/users").expect(200);
     });
   });
 
@@ -25,31 +22,31 @@ describe("User API Endpoints", async () => {
         password: faker.internet.password(),
       };
 
-      await axios.post("/signup", { ...user });
+      await request(app.server)
+        .post("/signup")
+        .send({ ...user });
+
       const {
-        data: { token },
-      } = await axios.post("/login", {
+        body: { token },
+      } = await request(app.server).post("/login").send({
         email: user.email,
         password: user.password,
       });
 
-      const { data } = await axios.get("/profile", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const { body } = await request(app.server)
+        .get("/profile")
+        .set("Authorization", `Bearer ${token}`)
+        .expect(200);
 
-      user = data;
+      user = body;
 
-      const response = await axios.get(`/users/${user.id}`);
-
-      expect(response.status).toBe(200);
+      await request(app.server).get(`/users/${user.id}`).expect(200);
     });
 
     it("Should return a not found error for non-existent ID", async () => {
       const testId = crypto.randomUUID().toString();
 
-      const response = await axios.get(`/users/${testId}`);
-
-      expect(response.status).toBe(404);
+      await request(app.server).get(`/users/${testId}`).expect(404);
     });
   });
 
@@ -61,24 +58,30 @@ describe("User API Endpoints", async () => {
         password: faker.internet.password(),
       };
 
-      await axios.post("/signup", { ...user });
+      await request(app.server)
+        .post("/signup")
+        .send({ ...user });
+
       const {
-        data: { token },
-      } = await axios.post("/login", {
+        body: { token },
+      } = await request(app.server).post("/login").send({
         email: user.email,
         password: user.password,
       });
 
-      const { data } = await axios.get("/profile", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const { body } = await request(app.server)
+        .get("/profile")
+        .set("Authorization", `Bearer ${token}`)
+        .expect(200);
 
-      user = data;
+      user = body;
 
-      const response = await axios.patch(`/users/${user.id}`, {
-        username: faker.internet.userName(),
-        email: faker.internet.email(),
-      });
+      const response = await request(app.server)
+        .patch(`/users/${user.id}`)
+        .send({
+          username: faker.internet.userName(),
+          email: faker.internet.email(),
+        });
 
       expect(response.status).toBe(200);
     });

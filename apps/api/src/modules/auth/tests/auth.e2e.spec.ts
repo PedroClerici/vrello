@@ -1,22 +1,22 @@
+import { app } from "@/app";
 import { faker } from "@faker-js/faker";
-import axios from "axios";
-import { inject } from "vitest";
+import request from "supertest";
 
 describe("Auth API Endpoints", async () => {
-  beforeAll(async () => {
-    axios.defaults.baseURL = inject("apiUrl");
-    axios.defaults.validateStatus = () => true;
+  beforeAll(() => {
+    app.ready();
   });
 
   describe("POST /signup", async () => {
     it("Should be able create user", async () => {
-      const response = await axios.post("/signup", {
-        username: faker.internet.userName(),
-        email: faker.internet.email(),
-        password: faker.internet.password(),
-      });
-
-      expect(response.status).toBe(201);
+      await request(app.server)
+        .post("/signup")
+        .send({
+          username: faker.internet.userName(),
+          email: faker.internet.email(),
+          password: faker.internet.password(),
+        })
+        .expect(201);
     });
 
     it("Should not be able create user with same username", async () => {
@@ -26,15 +26,15 @@ describe("Auth API Endpoints", async () => {
         password: faker.internet.password(),
       };
 
-      await axios.post("/signup", { ...user });
+      await request(app.server)
+        .post("/signup")
+        .send({ ...user });
 
-      const response = await axios.post("/signup", {
+      await request(app.server).post("/signup").send({
         username: user.username,
         email: faker.internet.email(),
         password: faker.internet.password(),
       });
-
-      expect(response.status).toBe(409);
     });
 
     it("Should not be able create user with same email", async () => {
@@ -44,15 +44,18 @@ describe("Auth API Endpoints", async () => {
         password: faker.internet.password(),
       };
 
-      await axios.post("/signup", { ...user });
+      await request(app.server)
+        .post("/signup")
+        .send({ ...user });
 
-      const response = await axios.post("/signup", {
-        username: faker.internet.userName(),
-        email: user.email,
-        password: faker.internet.password(),
-      });
-
-      expect(response.status).toBe(409);
+      await request(app.server)
+        .post("/signup")
+        .send({
+          username: faker.internet.userName(),
+          email: user.email,
+          password: faker.internet.password(),
+        })
+        .expect(409);
     });
   });
 
@@ -64,14 +67,17 @@ describe("Auth API Endpoints", async () => {
         password: faker.internet.password(),
       };
 
-      await axios.post("/signup", { ...user });
+      await request(app.server)
+        .post("/signup")
+        .send({ ...user });
 
-      const response = await axios.post("/login", {
-        email: user.email,
-        password: user.password,
-      });
-
-      expect(response.status).toBe(200);
+      await request(app.server)
+        .post("/login")
+        .send({
+          email: user.email,
+          password: user.password,
+        })
+        .expect(200);
     });
   });
 
@@ -83,11 +89,17 @@ describe("Auth API Endpoints", async () => {
         password: faker.internet.password(),
       };
 
-      await axios.post("/signup", { ...user });
-      const { headers } = await axios.post("/login", {
-        email: user.email,
-        password: user.password,
-      });
+      await request(app.server)
+        .post("/signup")
+        .send({ ...user });
+
+      const { headers } = await request(app.server)
+        .post("/login")
+        .send({
+          email: user.email,
+          password: user.password,
+        })
+        .expect(200);
 
       const refreshToken = headers["set-cookie"]
         ?.at(0)
@@ -96,13 +108,10 @@ describe("Auth API Endpoints", async () => {
         ?.split("=")
         ?.at(1) as string;
 
-      const response = await axios.patch(
-        "/refresh",
-        {},
-        { headers: { Cookie: `refreshToken=${refreshToken}` } },
-      );
-
-      expect(response.status).toBe(200);
+      await request(app.server)
+        .patch("/refresh")
+        .set("Cookie", [`refreshToken=${refreshToken}`])
+        .expect(200);
     });
   });
 
@@ -114,19 +123,21 @@ describe("Auth API Endpoints", async () => {
         password: faker.internet.password(),
       };
 
-      await axios.post("/signup", { ...user });
+      await request(app.server)
+        .post("/signup")
+        .send({ ...user });
+
       const {
-        data: { token },
-      } = await axios.post("/login", {
+        body: { token },
+      } = await request(app.server).post("/login").send({
         email: user.email,
         password: user.password,
       });
 
-      const response = await axios.get("/profile", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      expect(response.status).toBe(200);
+      await request(app.server)
+        .get("/profile")
+        .set("Authorization", `Bearer ${token}`)
+        .expect(200);
     });
   });
 });

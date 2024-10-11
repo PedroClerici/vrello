@@ -4,8 +4,8 @@ import { env } from "@/utils/env";
 import { ConflictError, NotFoundError } from "@/utils/errors";
 import { hash } from "@node-rs/bcrypt";
 import type { User } from "drizzle/schemas/users";
-import type { putUserBody } from "./users.schema";
 import type { signupBody } from "../auth/auth.schema";
+import type { putUserBody } from "./users.schema";
 
 export class UsersService {
   constructor(
