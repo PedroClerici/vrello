@@ -1,6 +1,7 @@
 import { app } from "@/app";
 import { faker } from "@faker-js/faker";
 import request from "supertest";
+import { makeUser } from "tests/factories";
 
 describe("Auth API Endpoints", async () => {
   beforeAll(() => {
@@ -12,19 +13,13 @@ describe("Auth API Endpoints", async () => {
       await request(app.server)
         .post("/signup")
         .send({
-          username: faker.internet.userName(),
-          email: faker.internet.email(),
-          password: faker.internet.password(),
+          ...makeUser(),
         })
         .expect(201);
     });
 
     it("Should not be able create user with same username", async () => {
-      const user = {
-        username: faker.internet.userName(),
-        email: faker.internet.email(),
-        password: faker.internet.password(),
-      };
+      const user = makeUser();
 
       await request(app.server)
         .post("/signup")
@@ -38,11 +33,7 @@ describe("Auth API Endpoints", async () => {
     });
 
     it("Should not be able create user with same email", async () => {
-      const user = {
-        username: faker.internet.userName(),
-        email: faker.internet.email(),
-        password: faker.internet.password(),
-      };
+      const user = makeUser();
 
       await request(app.server)
         .post("/signup")
@@ -51,6 +42,7 @@ describe("Auth API Endpoints", async () => {
       await request(app.server)
         .post("/signup")
         .send({
+          displayName: faker.person.fullName(),
           username: faker.internet.userName(),
           email: user.email,
           password: faker.internet.password(),
@@ -61,11 +53,7 @@ describe("Auth API Endpoints", async () => {
 
   describe("POST /login", async () => {
     it("Should be able login user", async () => {
-      const user = {
-        username: faker.internet.userName(),
-        email: faker.internet.email(),
-        password: faker.internet.password(),
-      };
+      const user = makeUser();
 
       await request(app.server)
         .post("/signup")
@@ -83,11 +71,7 @@ describe("Auth API Endpoints", async () => {
 
   describe("POST /refresh", async () => {
     it("Should be able to refresh token", async () => {
-      const user = {
-        username: faker.internet.userName(),
-        email: faker.internet.email(),
-        password: faker.internet.password(),
-      };
+      const user = makeUser();
 
       await request(app.server)
         .post("/signup")
@@ -117,11 +101,7 @@ describe("Auth API Endpoints", async () => {
 
   describe("GET /profile", async () => {
     it("Should be able to get user profile", async () => {
-      const user = {
-        username: faker.internet.userName(),
-        email: faker.internet.email(),
-        password: faker.internet.password(),
-      };
+      const user = makeUser();
 
       await request(app.server)
         .post("/signup")

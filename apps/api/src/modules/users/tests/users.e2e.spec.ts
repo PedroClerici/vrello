@@ -1,7 +1,7 @@
 import { app } from "@/app";
 import { faker } from "@faker-js/faker";
-import type { User } from "drizzle/schemas/users";
 import request from "supertest";
+import { makeUser } from "tests/factories";
 
 describe("User API Endpoints", async () => {
   beforeAll(() => {
@@ -14,13 +14,9 @@ describe("User API Endpoints", async () => {
     });
   });
 
-  describe("GET /users/:id", async () => {
+  describe("GET /users/:username", async () => {
     it("Should be able to get users", async () => {
-      let user: Partial<User> = {
-        username: faker.internet.userName(),
-        email: faker.internet.email(),
-        password: faker.internet.password(),
-      };
+      let user = makeUser();
 
       await request(app.server)
         .post("/signup")
@@ -40,23 +36,19 @@ describe("User API Endpoints", async () => {
 
       user = body;
 
-      await request(app.server).get(`/users/${user.id}`).expect(200);
+      await request(app.server).get(`/users/${user.username}`).expect(200);
     });
 
     it("Should return a not found error for non-existent ID", async () => {
-      const testId = crypto.randomUUID().toString();
+      const testUsername = faker.internet.userName();
 
-      await request(app.server).get(`/users/${testId}`).expect(404);
+      await request(app.server).get(`/users/${testUsername}`).expect(404);
     });
   });
 
-  describe("PATCH /users/:id", async () => {
+  describe("PATCH /users/:username", async () => {
     it("Should be able to update user", async () => {
-      let user: Partial<User> = {
-        username: faker.internet.userName(),
-        email: faker.internet.email(),
-        password: faker.internet.password(),
-      };
+      let user = makeUser();
 
       await request(app.server)
         .post("/signup")
@@ -77,7 +69,7 @@ describe("User API Endpoints", async () => {
       user = body;
 
       const response = await request(app.server)
-        .patch(`/users/${user.id}`)
+        .patch(`/users/${user.username}`)
         .send({
           username: faker.internet.userName(),
           email: faker.internet.email(),

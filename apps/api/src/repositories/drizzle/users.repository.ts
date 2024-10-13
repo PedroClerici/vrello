@@ -60,6 +60,18 @@ export class DrizzleUsersRepository implements Repository<User> {
     return user;
   }
 
+  async updateBy(
+    key: Keys<User>,
+    value: User[keyof User],
+    data: Partial<User>,
+  ) {
+    return await db
+      .update(users)
+      .set({ ...data })
+      .where(eq(users[key], value))
+      .returning();
+  }
+
   async delete(id: string) {
     await db.delete(users).where(eq(users.id, id)).returning();
   }

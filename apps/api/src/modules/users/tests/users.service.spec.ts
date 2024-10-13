@@ -28,13 +28,17 @@ describe("Users Service", () => {
       throw new Error("User does not exist!");
     }
 
-    const user = await usersServiceInstance.getUserById(inMemoryUser.id);
+    const user = await usersServiceInstance.getUserByUsername(
+      inMemoryUser.username,
+    );
 
     expect(user).toBe(inMemoryUser);
   });
 
   it("Must throw if user does not exist", async () => {
-    const userPromise = usersServiceInstance.getUserById(crypto.randomUUID());
+    const userPromise = usersServiceInstance.getUserByUsername(
+      crypto.randomUUID(),
+    );
 
     expect(userPromise).rejects.toThrowError(NotFoundError);
   });

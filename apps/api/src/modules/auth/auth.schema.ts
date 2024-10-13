@@ -18,7 +18,12 @@ export const loginSchema = {
 export type signupBody = z.infer<typeof signupSchema.body>;
 export const signupSchema = {
   tags: ["Auth"],
-  body: userSchema.pick({ username: true, email: true, password: true }),
+  body: userSchema.pick({
+    displayName: true,
+    username: true,
+    email: true,
+    password: true,
+  }),
   response: { 200: {} },
 } satisfies FastifyZodOpenApiSchema;
 

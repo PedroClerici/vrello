@@ -1,10 +1,9 @@
-import { greetingHook } from "@/hooks/greeting.hook";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 
-export default async function usersRouter(app: FastifyInstance) {
+export default async function healthRouter(app: FastifyInstance) {
   app.get(
-    "",
+    "/healthz",
     {
       schema: {
         tags: ["Health"],
@@ -12,7 +11,6 @@ export default async function usersRouter(app: FastifyInstance) {
           200: z.object({ message: z.literal("Service is healthy.") }),
         },
       },
-      onRequest: [greetingHook],
     },
     async (_request, reply) => {
       reply.status(200).send({ message: "Service is healthy." });

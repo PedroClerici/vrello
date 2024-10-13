@@ -6,10 +6,12 @@ export const userResponseSchema = userSchema.omit({
   password: true,
 });
 
-export type getUserByIdParams = z.infer<typeof getUserByIdSchema.params>;
-export const getUserByIdSchema = {
+export type getUserByUsernameParams = z.infer<
+  typeof getUserByUsernameSchema.params
+>;
+export const getUserByUsernameSchema = {
   tags: ["Users"],
-  params: userSchema.pick({ id: true }),
+  params: userSchema.pick({ username: true }),
   response: { 200: userResponseSchema },
 } satisfies FastifyZodOpenApiSchema;
 
@@ -22,16 +24,18 @@ export type putUserParams = z.infer<typeof putUserSchema.params>;
 export type putUserBody = z.infer<typeof putUserSchema.body>;
 export const putUserSchema = {
   tags: ["Users"],
-  params: userSchema.pick({ id: true }),
+  params: userSchema.pick({ username: true }),
   body: userSchema
-    .pick({ username: true, email: true, password: true })
+    .pick({ displayName: true, username: true, email: true, password: true })
     .partial(),
   response: { 200: userResponseSchema },
 } satisfies FastifyZodOpenApiSchema;
 
-export type deleteUserByIdParams = z.infer<typeof getUserByIdSchema.params>;
-export const deleteUserByIdSchema = {
+export type deleteUserByUsernameParams = z.infer<
+  typeof getUserByUsernameSchema.params
+>;
+export const deleteUserByUsernameSchema = {
   tags: ["Users"],
-  params: userSchema.pick({ id: true }),
+  params: userSchema.pick({ username: true }),
   response: { 204: {} },
 } satisfies FastifyZodOpenApiSchema;

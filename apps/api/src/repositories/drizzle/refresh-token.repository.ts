@@ -77,6 +77,18 @@ export class DrizzleRefreshTokensRepository
     return refreshToken;
   }
 
+  async updateBy(
+    key: Keys<RefreshToken>,
+    value: RefreshToken[keyof RefreshToken],
+    data: Partial<RefreshToken>,
+  ) {
+    return await db
+      .update(refreshTokens)
+      .set({ ...data })
+      .where(eq(refreshTokens[key], value))
+      .returning();
+  }
+
   async delete(id: string) {
     await db.delete(refreshTokens).where(eq(refreshTokens.id, id)).returning();
   }

@@ -5,6 +5,7 @@ export class InMemoryUsersRepository implements Repository<User> {
   private users: User[] = [
     {
       id: crypto.randomUUID().toString(),
+      displayName: "John Doe",
       username: "John_Doe",
       email: "john.doe@example.com",
       password: "randomHash",
@@ -13,6 +14,7 @@ export class InMemoryUsersRepository implements Repository<User> {
     },
     {
       id: crypto.randomUUID().toString(),
+      displayName: "Joe Shmoe",
       username: "Joe_Shmoe",
       email: "joe.shmoe@example.com",
       password: "anotherRandomHash",
@@ -67,6 +69,18 @@ export class InMemoryUsersRepository implements Repository<User> {
     );
 
     return this.users[index];
+  }
+
+  async updateBy(
+    key: Keys<User>,
+    value: User[keyof User],
+    data: Partial<User>,
+  ) {
+    this.users = this.users.map((user) =>
+      user[key] === value ? { ...user, ...data } : user,
+    );
+
+    return this.users.filter((user) => user[key] === value);
   }
 
   async delete(id: string): Promise<void> {

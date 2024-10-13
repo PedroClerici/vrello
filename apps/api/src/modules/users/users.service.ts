@@ -12,7 +12,12 @@ export class UsersService {
     private readonly usersRepository: Repository<User> = new DrizzleUsersRepository(),
   ) {}
 
-  createUser = async ({ username, email, password }: signupBody) => {
+  createUser = async ({
+    displayName,
+    username,
+    email,
+    password,
+  }: signupBody) => {
     const [userWithSameEmail] = await this.usersRepository.findBy(
       "email",
       email,
@@ -32,6 +37,7 @@ export class UsersService {
     const hashedPassword = await hash(password, env.SALT_ROUNDS);
 
     const user = this.usersRepository.create({
+      displayName,
       username,
       email,
       password: hashedPassword,
@@ -46,6 +52,14 @@ export class UsersService {
     return users;
   };
 
+  getUserByUsername = async (username: string) => {
+    const [user] = await this.usersRepository.findBy({ username: username });
+    if (!user)
+      throw new NotFoundError(`couldn't find user with username '${username}'`);
+
+    return user;
+  };
+
   getUserById = async (id: string) => {
     const user = await this.usersRepository.find(id);
     if (!user) throw new NotFoundError(`couldn't find user with id '${id}'`);
@@ -53,8 +67,8 @@ export class UsersService {
     return user;
   };
 
-  updateUserById = async (
-    id: string,
+  updateUserByUsername = async (
+    originalUsername: string,
     { username, email, password }: putUserBody,
   ) => {
     if (username) {
@@ -62,7 +76,10 @@ export class UsersService {
         "username",
         username,
       );
-      if (userWithSameUsername && userWithSameUsername.id !== id)
+      if (
+        userWithSameUsername &&
+        userWithSameUsername.username !== originalUsername
+      )
         throw new ConflictError(
           `User with username '${username}' already exists`,
         );
@@ -73,25 +90,33 @@ export class UsersService {
         "email",
         email,
       );
-      if (userWithSameEmail && userWithSameEmail.id !== id)
+      if (userWithSameEmail && userWithSameEmail.username !== originalUsername)
         throw new ConflictError(`User with email '${email}' already exists`);
     }
 
-    const user = await this.usersRepository.update(id, {
-      username,
-      email,
-      password,
-    });
-    if (!user) throw new NotFoundError(`couldn't find user with id '${id}'`);
+    const [user] = await this.usersRepository.updateBy(
+      "username",
+      originalUsername,
+      {
+        username,
+        email,
+        password,
+      },
+    );
+    if (!user)
+      throw new NotFoundError(
+        `couldn't find user with username '${originalUsername}'`,
+      );
 
     return user;
   };
 
-  deleteUserById = async (id: string) => {
-    const user = await this.usersRepository.find(id);
-    if (!user) throw new NotFoundError(`couldn't find user with id '${id}'`);
+  deleteUserByUsername = async (username: string) => {
+    const [user] = await this.usersRepository.findBy("username", username);
+    if (!user)
+      throw new NotFoundError(`couldn't find user with username '${username}'`);
 
-    await this.usersRepository.delete(id);
+    await this.usersRepository.delete(user.id);
   };
 }
 

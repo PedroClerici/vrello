@@ -17,6 +17,7 @@ import { usersRouter } from "./modules/users/users.router";
 import { env } from "./utils/env";
 import { makeError } from "./utils/errors";
 import { loggerConfig } from "./utils/logger";
+import healthRouter from "./modules/health/health.router";
 
 export const app = fastify({
   logger: loggerConfig[env.NODE_ENV],
@@ -67,6 +68,7 @@ app.setErrorHandler(async (err, request, reply) => {
 });
 
 await app.register((app, _, done) => {
+  app.register(healthRouter);
   app.register(authRouter);
   app.register(usersRouter, { prefix: "/users" });
 

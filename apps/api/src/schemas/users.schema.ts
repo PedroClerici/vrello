@@ -6,6 +6,10 @@ export const userSchema = z.object({
   id: z.string().uuid().openapi({
     description: "User ID",
   }),
+  displayName: z.string().openapi({
+    description: "Display Name",
+    example: "John Doe",
+  }),
   username: z.string().openapi({
     description: "Username",
     example: "john.doe",

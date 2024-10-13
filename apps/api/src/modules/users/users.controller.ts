@@ -1,7 +1,7 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import type {
-  deleteUserByIdParams,
-  getUserByIdParams,
+  deleteUserByUsernameParams,
+  getUserByUsernameParams,
   putUserBody,
   putUserParams,
 } from "./users.schema";
@@ -13,31 +13,31 @@ class UsersController {
     reply.status(200).send(users);
   };
 
-  getUserById = async (
-    request: FastifyRequest<{ Params: getUserByIdParams }>,
+  getUserByUsername = async (
+    request: FastifyRequest<{ Params: getUserByUsernameParams }>,
     reply: FastifyReply,
   ) => {
-    const { id } = request.params;
-    const user = await usersService.getUserById(id);
+    const { username } = request.params;
+    const user = await usersService.getUserByUsername(username);
     reply.status(200).send(user);
   };
 
-  updateUserById = async (
+  updateUserByUsername = async (
     request: FastifyRequest<{ Params: putUserParams; Body: putUserBody }>,
     reply: FastifyReply,
   ) => {
-    const { id } = request.params;
+    const { username } = request.params;
     const payload = request.body;
-    const user = await usersService.updateUserById(id, payload);
+    const user = await usersService.updateUserByUsername(username, payload);
     reply.status(200).send(user);
   };
 
-  deleteUserById = async (
-    request: FastifyRequest<{ Params: deleteUserByIdParams }>,
+  deleteUserByUsername = async (
+    request: FastifyRequest<{ Params: deleteUserByUsernameParams }>,
     reply: FastifyReply,
   ) => {
-    const { id } = request.params;
-    const user = await usersService.deleteUserById(id);
+    const { username } = request.params;
+    const user = await usersService.deleteUserByUsername(username);
     reply.status(200).send(user);
   };
 }
