@@ -26,18 +26,9 @@ export class DrizzleUsersRepository implements Repository<User> {
     return user;
   }
 
-  async findBy(key: Keys<User>, value: User[keyof User]): Promise<User[]>;
-  async findBy(filter: Filter<User>): Promise<User[]>;
-  async findBy(
-    keyOrFilter: Keys<User> | Filter<User>,
-    value?: User[keyof User],
-  ) {
-    if (typeof value === "string" && typeof keyOrFilter === "string") {
-      return await db.select().from(users).where(eq(users[keyOrFilter], value));
-    }
-
+  async findBy(filter: Filter<User>) {
     const eqs: SQLWrapper[] = [];
-    for (const [column, value] of Object.entries(keyOrFilter)) {
+    for (const [column, value] of Object.entries(filter)) {
       eqs.push(eq(users[column as Keys<User>], value));
     }
 
@@ -60,15 +51,16 @@ export class DrizzleUsersRepository implements Repository<User> {
     return user;
   }
 
-  async updateBy(
-    key: Keys<User>,
-    value: User[keyof User],
-    data: Partial<User>,
-  ) {
+  async updateBy(filter: Filter<User>, data: Partial<User>) {
+    const eqs: SQLWrapper[] = [];
+    for (const [column, value] of Object.entries(filter)) {
+      eqs.push(eq(users[column as Keys<User>], value));
+    }
+
     return await db
       .update(users)
       .set({ ...data })
-      .where(eq(users[key], value))
+      .where(and(...eqs))
       .returning();
   }
 
@@ -76,18 +68,9 @@ export class DrizzleUsersRepository implements Repository<User> {
     await db.delete(users).where(eq(users.id, id)).returning();
   }
 
-  async deleteBy(key: Keys<User>, value: User[keyof User]): Promise<void>;
-  async deleteBy(filter: Filter<User>): Promise<void>;
-  async deleteBy(
-    keyOrFilter: Keys<User> | Filter<User>,
-    value?: User[keyof User],
-  ) {
-    if (typeof value === "string" && typeof keyOrFilter === "string") {
-      await db.delete(users).where(eq(users[keyOrFilter], value));
-    }
-
+  async deleteBy(filter: Filter<User>) {
     const eqs: SQLWrapper[] = [];
-    for (const [column, value] of Object.entries(keyOrFilter)) {
+    for (const [column, value] of Object.entries(filter)) {
       eqs.push(eq(users[column as Keys<User>], value));
     }
 

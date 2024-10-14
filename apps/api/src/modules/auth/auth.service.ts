@@ -47,7 +47,7 @@ class AuthService {
   }
 
   async login({ email, password }: loginBody) {
-    const [user] = await this.usersRepository.findBy("email", email);
+    const [user] = await this.usersRepository.findBy({ email: email });
     if (!user)
       throw new UnauthorizedError(
         "The provided username and password combination is incorrect.",

@@ -10,6 +10,9 @@
         "noUnusedFunctionParameters": "error",
         "noUnusedImports": "error",
         "noUnusedPrivateClassMembers": "error"
+      },
+      "style": {
+        "noParameterAssign": "off"
       }
     }
   }

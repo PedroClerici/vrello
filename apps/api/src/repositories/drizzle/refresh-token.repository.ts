@@ -37,24 +37,9 @@ export class DrizzleRefreshTokensRepository
     return refreshToken;
   }
 
-  async findBy(
-    key: Keys<RefreshToken>,
-    value: RefreshToken[keyof RefreshToken],
-  ): Promise<RefreshToken[]>;
-  async findBy(filter: Filter<RefreshToken>): Promise<RefreshToken[]>;
-  async findBy(
-    keyOrFilter: Keys<RefreshToken> | Filter<RefreshToken>,
-    value?: RefreshToken[keyof RefreshToken],
-  ) {
-    if (typeof value === "string" && typeof keyOrFilter === "string") {
-      return await db
-        .select()
-        .from(refreshTokens)
-        .where(eq(refreshTokens[keyOrFilter], value));
-    }
-
+  async findBy(filter: Filter<RefreshToken>) {
     const eqs: SQLWrapper[] = [];
-    for (const [column, value] of Object.entries(keyOrFilter)) {
+    for (const [column, value] of Object.entries(filter)) {
       eqs.push(eq(refreshTokens[column as Keys<RefreshToken>], value));
     }
 
@@ -77,15 +62,16 @@ export class DrizzleRefreshTokensRepository
     return refreshToken;
   }
 
-  async updateBy(
-    key: Keys<RefreshToken>,
-    value: RefreshToken[keyof RefreshToken],
-    data: Partial<RefreshToken>,
-  ) {
+  async updateBy(filter: Filter<RefreshToken>, data: Partial<RefreshToken>) {
+    const eqs: SQLWrapper[] = [];
+    for (const [column, value] of Object.entries(filter)) {
+      eqs.push(eq(refreshTokens[column as Keys<RefreshToken>], value));
+    }
+
     return await db
       .update(refreshTokens)
       .set({ ...data })
-      .where(eq(refreshTokens[key], value))
+      .where(and(...eqs))
       .returning();
   }
 
@@ -93,23 +79,9 @@ export class DrizzleRefreshTokensRepository
     await db.delete(refreshTokens).where(eq(refreshTokens.id, id)).returning();
   }
 
-  async deleteBy(
-    key: Keys<RefreshToken>,
-    value: RefreshToken[keyof RefreshToken],
-  ): Promise<void>;
-  async deleteBy(filter: Filter<RefreshToken>): Promise<void>;
-  async deleteBy(
-    keyOrFilter: Keys<RefreshToken> | Filter<RefreshToken>,
-    value?: RefreshToken[keyof RefreshToken],
-  ) {
-    if (typeof value === "string" && typeof keyOrFilter === "string") {
-      await db
-        .delete(refreshTokens)
-        .where(eq(refreshTokens[keyOrFilter], value));
-    }
-
+  async deleteBy(filter: Filter<RefreshToken>) {
     const eqs: SQLWrapper[] = [];
-    for (const [column, value] of Object.entries(keyOrFilter)) {
+    for (const [column, value] of Object.entries(filter)) {
       eqs.push(eq(refreshTokens[column as Keys<RefreshToken>], value));
     }
 

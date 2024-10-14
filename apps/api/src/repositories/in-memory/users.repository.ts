@@ -1,5 +1,5 @@
 import type { User } from "drizzle/schemas/users";
-import type { Filter, Keys, Repository } from "..";
+import type { Filter, Repository } from "..";
 
 export class InMemoryUsersRepository implements Repository<User> {
   private users: User[] = [
@@ -45,18 +45,9 @@ export class InMemoryUsersRepository implements Repository<User> {
     return index !== -1 ? this.users[index] : undefined;
   }
 
-  async findBy(key: Keys<User>, value: User[keyof User]): Promise<User[]>;
-  async findBy(filter: Filter<User>): Promise<User[]>;
-  async findBy(
-    keyOrFilter: Keys<User> | Filter<User>,
-    value?: User[keyof User],
-  ) {
-    if (typeof value === "string" && typeof keyOrFilter === "string") {
-      return this.users.filter((user) => user[keyOrFilter] === value);
-    }
-
+  async findBy(filter: Filter<User>) {
     return this.users.filter((user) =>
-      Object.entries(keyOrFilter).every(
+      Object.entries(filter).every(
         ([key, value]) => user[key as keyof Filter<User>] === value,
       ),
     );
@@ -71,16 +62,21 @@ export class InMemoryUsersRepository implements Repository<User> {
     return this.users[index];
   }
 
-  async updateBy(
-    key: Keys<User>,
-    value: User[keyof User],
-    data: Partial<User>,
-  ) {
-    this.users = this.users.map((user) =>
-      user[key] === value ? { ...user, ...data } : user,
-    );
+  async updateBy(filter: Filter<User>, data: Partial<User>) {
+    const updatedUsers: Array<User> = [];
 
-    return this.users.filter((user) => user[key] === value);
+    this.users.map((user) => {
+      const isOnFilter = Object.entries(filter).every(
+        ([key, value]) => user[key as keyof Filter<User>] === value,
+      );
+
+      if (isOnFilter) {
+        user = { ...user, ...data };
+        updatedUsers.push(user);
+      }
+    });
+
+    return updatedUsers;
   }
 
   async delete(id: string): Promise<void> {
@@ -90,18 +86,9 @@ export class InMemoryUsersRepository implements Repository<User> {
     }
   }
 
-  async deleteBy(key: Keys<User>, value: User[keyof User]): Promise<void>;
-  async deleteBy(filter: Filter<User>): Promise<void>;
-  async deleteBy(
-    keyOrFilter: Keys<User> | Filter<User>,
-    value?: User[keyof User],
-  ) {
-    if (typeof value === "string" && typeof keyOrFilter === "string") {
-      this.users = this.users.filter((user) => user[keyOrFilter] === value);
-    }
-
+  async deleteBy(filter: Filter<User>) {
     this.users = this.users.filter((user) =>
-      Object.entries(keyOrFilter).every(
+      Object.entries(filter).every(
         ([key, value]) => user[key as keyof Filter<User>] === value,
       ),
     );

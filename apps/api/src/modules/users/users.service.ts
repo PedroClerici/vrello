@@ -18,17 +18,15 @@ export class UsersService {
     email,
     password,
   }: signupBody) => {
-    const [userWithSameEmail] = await this.usersRepository.findBy(
-      "email",
-      email,
-    );
+    const [userWithSameEmail] = await this.usersRepository.findBy({
+      email: email,
+    });
     if (userWithSameEmail)
       throw new ConflictError(`User with email '${email}' already exists`);
 
-    const [userWithSameUsername] = await this.usersRepository.findBy(
-      "username",
-      username,
-    );
+    const [userWithSameUsername] = await this.usersRepository.findBy({
+      username: username,
+    });
     if (userWithSameUsername)
       throw new ConflictError(
         `User with username '${username}' already exists`,
@@ -72,10 +70,9 @@ export class UsersService {
     { username, email, password }: putUserBody,
   ) => {
     if (username) {
-      const [userWithSameUsername] = await this.usersRepository.findBy(
-        "username",
-        username,
-      );
+      const [userWithSameUsername] = await this.usersRepository.findBy({
+        username: username,
+      });
       if (
         userWithSameUsername &&
         userWithSameUsername.username !== originalUsername
@@ -86,17 +83,15 @@ export class UsersService {
     }
 
     if (email) {
-      const [userWithSameEmail] = await this.usersRepository.findBy(
-        "email",
-        email,
-      );
+      const [userWithSameEmail] = await this.usersRepository.findBy({
+        email: email,
+      });
       if (userWithSameEmail && userWithSameEmail.username !== originalUsername)
         throw new ConflictError(`User with email '${email}' already exists`);
     }
 
     const [user] = await this.usersRepository.updateBy(
-      "username",
-      originalUsername,
+      { username: originalUsername },
       {
         username,
         email,
@@ -112,7 +107,7 @@ export class UsersService {
   };
 
   deleteUserByUsername = async (username: string) => {
-    const [user] = await this.usersRepository.findBy("username", username);
+    const [user] = await this.usersRepository.findBy({ username: username });
     if (!user)
       throw new NotFoundError(`couldn't find user with username '${username}'`);
 
