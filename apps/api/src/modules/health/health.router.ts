@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 
-export default async function healthRouter(app: FastifyInstance) {
+export async function healthRouter(app: FastifyInstance) {
   app.get(
     "/healthz",
     {

@@ -1,6 +1,7 @@
 import { type InferSelectModel, relations, sql } from "drizzle-orm";
 import { pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { refreshTokens } from "./refresh-tokens";
+import { boardMembers } from "./board-members";
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
@@ -16,7 +17,8 @@ export const users = pgTable("users", {
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
-  posts: many(refreshTokens),
+  refreshTokens: many(refreshTokens),
+  boards: many(boardMembers),
 }));
 
 export type User = InferSelectModel<typeof users>;

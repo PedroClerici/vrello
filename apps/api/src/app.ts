@@ -12,12 +12,13 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from "fastify-zod-openapi";
+import { healthRouter } from "./modules/health/health.router";
 import { authRouter } from "./modules/auth/auth.router";
 import { usersRouter } from "./modules/users/users.router";
 import { env } from "./utils/env";
 import { makeError } from "./utils/errors";
 import { loggerConfig } from "./utils/logger";
-import healthRouter from "./modules/health/health.router";
+import { boardsRouter } from "./modules/boards/boards.router";
 
 export const app = fastify({
   logger: loggerConfig[env.NODE_ENV],
@@ -71,6 +72,7 @@ await app.register((app, _, done) => {
   app.register(healthRouter);
   app.register(authRouter);
   app.register(usersRouter, { prefix: "/users" });
+  app.register(boardsRouter, { prefix: "/boards" });
 
   done();
 });

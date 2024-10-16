@@ -2,8 +2,8 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import type {
   deleteUserByUsernameParams,
   getUserByUsernameParams,
-  putUserBody,
-  putUserParams,
+  updateUserBody,
+  updateUserParams,
 } from "./users.schema";
 import { usersService } from "./users.service";
 
@@ -23,7 +23,7 @@ class UsersController {
   };
 
   updateUserByUsername = async (
-    request: FastifyRequest<{ Params: putUserParams; Body: putUserBody }>,
+    request: FastifyRequest<{ Params: updateUserParams; Body: updateUserBody }>,
     reply: FastifyReply,
   ) => {
     const { username } = request.params;

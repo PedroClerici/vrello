@@ -20,9 +20,9 @@ export const getUsersSchema = {
   response: { 200: z.array(userResponseSchema) },
 } satisfies FastifyZodOpenApiSchema;
 
-export type putUserParams = z.infer<typeof putUserSchema.params>;
-export type putUserBody = z.infer<typeof putUserSchema.body>;
-export const putUserSchema = {
+export type updateUserParams = z.infer<typeof updateUserSchema.params>;
+export type updateUserBody = z.infer<typeof updateUserSchema.body>;
+export const updateUserSchema = {
   tags: ["Users"],
   params: userSchema.pick({ username: true }),
   body: userSchema

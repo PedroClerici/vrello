@@ -4,7 +4,7 @@ import {
   deleteUserByUsernameSchema,
   getUserByUsernameSchema,
   getUsersSchema,
-  putUserSchema,
+  updateUserSchema,
 } from "./users.schema";
 
 export async function usersRouter(app: FastifyInstance) {
@@ -16,7 +16,7 @@ export async function usersRouter(app: FastifyInstance) {
   );
   app.patch(
     "/:username",
-    { schema: putUserSchema },
+    { schema: updateUserSchema },
     usersController.updateUserByUsername,
   );
   app.delete(

@@ -1,7 +1,14 @@
+import type { headerSchema } from "@/schemas/headers.schema";
 import { UnauthorizedError } from "@/utils/errors";
 import type { FastifyReply, FastifyRequest } from "fastify";
+import type { z } from "zod";
 
-export async function verifyJwtHook(request: FastifyRequest, _: FastifyReply) {
+export type Headers = z.infer<typeof headerSchema>;
+
+export async function verifyJwtHook(
+  request: FastifyRequest<{ Headers: Headers }>,
+  _: FastifyReply,
+) {
   const token = request.headers.Authorization;
   if (!token) throw new UnauthorizedError("Unauthorized");
 

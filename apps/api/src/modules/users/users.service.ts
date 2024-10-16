@@ -5,7 +5,7 @@ import { ConflictError, NotFoundError } from "@/utils/errors";
 import { hash } from "@node-rs/bcrypt";
 import type { User } from "drizzle/schemas/users";
 import type { signupBody } from "../auth/auth.schema";
-import type { putUserBody } from "./users.schema";
+import type { updateUserBody } from "./users.schema";
 
 export class UsersService {
   constructor(
@@ -67,7 +67,7 @@ export class UsersService {
 
   updateUserByUsername = async (
     originalUsername: string,
-    { username, email, password }: putUserBody,
+    { username, email, password }: updateUserBody,
   ) => {
     if (username) {
       const [userWithSameUsername] = await this.usersRepository.findBy({
